@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="menu">
+  <database-model serializer="dbm" dbms="MONGO" family-id="MONGO" format-version="4.53">
+    <root id="1">
+      <ServerVersion>8.0.4</ServerVersion>
+    </root>
+    <schema id="2" parent="1" name="admin"/>
+    <schema id="3" parent="1" name="b3_assessment"/>
+    <schema id="4" parent="1" name="b4_assessment"/>
+    <schema id="5" parent="1" name="config"/>
+    <schema id="6" parent="1" name="day26workshop"/>
+    <schema id="7" parent="1" name="day28classroom"/>
+    <schema id="8" parent="1" name="finalProj"/>
+    <schema id="9" parent="1" name="local"/>
+    <schema id="10" parent="1" name="movies"/>
+    <schema id="11" parent="1" name="mystore">
+      <Current>1</Current>
+    </schema>
+    <schema id="12" parent="1" name="showsdb"/>
+  </database-model>
+</dataSource>

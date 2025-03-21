@@ -1,65 +1,48 @@
 <div class="row mt-3">
   <div class="col d-flex justify-content-between align-items-center">
-    <div class="fs-1 fw-bold text-primary">Menu ($XXX)</div>
+    <div class="fs-1 fw-bold text-primary">Menu (${{ formatPrice((totalCost$ | async) ?? 0) }})</div>
     <div>
-      <button type="button" class="btn btn-primary">
-        Place Order (XXX)
+      <button type="button" class="btn btn-primary" [disabled]="(totalCount$ | async) === 0"
+              (click)="placeOrder()">
+        Place Order ({{ totalCount$ | async }})
       </button>
     </div>
   </div>
 </div>
 
-<!-- each row display a single mene item -->
-<div class="row mb-2">
-  <div class="col">
-    <div class="menu-item">
-      <div>
-        <button type="button" class="btn btn-warning">
-          <i class="bi bi-x-square"></i>
-        </button>
-      </div>
-      <div class="menu-details">
-        <div>Name: <span class="fw-bold"> XXX </span> </div>
-        <div>Description:
-          <span class="fst-italic">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+@if (menuItems$ | async; as menuItems) {
+  @for (item of menuItems; track item.id) {
+    <!-- each row display a single menu item -->
+    <div class="row mb-2">
+      <div class="col">
+        <div class="menu-item">
+          <div>
+            <button type="button" class="btn btn-warning" (click)="removeItem(item.id)"
+                    [disabled]="(getQuantity(item.id) | async) === 0">
+              <i class="bi bi-x-square"></i>
+            </button>
+          </div>
+          <div class="menu-details">
+            <div>Name: <span class="fw-bold"> {{ item.name }} </span></div>
+            <div>Description:
+              <span class="fst-italic">
+            {{ item.description }}
           </span>
+            </div>
+            <div>Price: <span class="fw-bold">${{ formatPrice(item.price) }}</span></div>
+            @if (((getQuantity(item.id) | async) ?? 0) > 0) {
+              <div class="text-danger fw-bold">
+                Quantity: {{ getQuantity(item.id) | async }}
+              </div>
+            }
+          </div>
+          <div class="menu-button-end">
+            <button type="button" class="btn btn-success" (click)="addItem(item.id)">
+              <i class="bi bi-plus-circle"></i>
+            </button>
+          </div>
         </div>
-        <div></div>
-          <div class="text-danger fw-bold">Quantity: XXX</div>
-      </div>
-      <div class="menu-button-end">
-        <button type="button" class="btn btn-success">
-          <i class="bi bi-plus-circle"></i>
-        </button>
       </div>
     </div>
-  </div>
-</div>
-
-<div class="row mb-2">
-  <div class="col">
-    <div class="menu-item">
-      <div>
-        <button type="button" class="btn btn-warning">
-          <i class="bi bi-x-square"></i>
-        </button>
-      </div>
-      <div class="menu-details">
-        <div>Name: <span class="fw-bold"> XXX </span> </div>
-        <div>Description:
-          <span class="fst-italic">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-          </span>
-        </div>
-        <div></div>
-          <div class="text-danger fw-bold">Quantity: XXX</div>
-      </div>
-      <div class="menu-button-end">
-        <button type="button" class="btn btn-success">
-          <i class="bi bi-plus-circle"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+  }
+}

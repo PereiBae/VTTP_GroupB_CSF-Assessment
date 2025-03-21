@@ -27,6 +27,7 @@ public class RestaurantController {
   @ResponseBody
   public ResponseEntity<List<MenuItem>> getMenus() {
 
+    System.out.println("getMenus called");
     List<MenuItem> menuItems = restaurantService.getMenu();
 
     return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(menuItems);

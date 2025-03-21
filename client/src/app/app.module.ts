@@ -14,7 +14,7 @@ import {RouterModule, Routes} from '@angular/router';
 const appRoutes: Routes = [
   {path: '', component: MenuComponent},
   {path:'place-order', component: PlaceOrderComponent},
-  {path: 'orderPlaced', component: ConfirmationComponent},
+  {path: 'confirmation', component: ConfirmationComponent},
   {path: '**', redirectTo:'/', pathMatch:'full'},
 ]
 

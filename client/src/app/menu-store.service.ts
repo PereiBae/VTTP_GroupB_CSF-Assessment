@@ -9,8 +9,6 @@ const INITIAL_STATE: MenuState = {
   selectedItems: {},
   totalCost: 0,
   totalCount: 0,
-  isLoading: false,
-  error: null
 };
 
 @Injectable({
@@ -30,8 +28,6 @@ export class MenuStoreService extends ComponentStore<MenuState>{
   readonly selectedItems$ = this.select(state => state.selectedItems);
   readonly totalCost$ = this.select(state => state.totalCost);
   readonly totalCount$ = this.select(state => state.totalCount);
-  readonly isLoading$ = this.select(state => state.isLoading);
-  readonly error$ = this.select(state => state.error);
 
   // Combined selector to check if an item is selected
   readonly getQuantity = (id: string) => this.select(
@@ -42,25 +38,10 @@ export class MenuStoreService extends ComponentStore<MenuState>{
   readonly setMenuItems = this.updater(
     (state, menuItems: MenuItem[]) => ({
       ...state,
-      menuItems,
-      isLoading: false
+      menuItems
     })
   );
 
-  readonly setLoading = this.updater(
-    (state, isLoading: boolean) => ({
-      ...state,
-      isLoading
-    })
-  );
-
-  readonly setError = this.updater(
-    (state, error: string | null) => ({
-      ...state,
-      error,
-      isLoading: false
-    })
-  );
 
   readonly addItem = this.updater(
     (state, itemId: string) => {
@@ -103,10 +84,8 @@ export class MenuStoreService extends ComponentStore<MenuState>{
   );
 
   loadMenuItems(): void {
-    this.setLoading(true);
     this.restaurantService.getMenuItems().subscribe({
       next: (menuItems) => this.setMenuItems(menuItems),
-      error: (error) => this.setError(error.message || 'Failed to load menu items')
     });
   }
 
@@ -140,5 +119,9 @@ export class MenuStoreService extends ComponentStore<MenuState>{
 
     return { totalCost, totalCount };
   }
+
+  readonly getOrderItems = this.select<MenuItem[]>(
+    (slice: MenuState) => slice.menuItems
+  )
 
 }

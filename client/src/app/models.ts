@@ -16,6 +16,26 @@ export interface MenuState {
   selectedItems: { [id: string]: number }; // id -> quantity mapping
   totalCost: number;
   totalCount: number;
-  isLoading: boolean;
-  error: string | null;
+}
+
+export interface OrderItem extends MenuItem {
+  quantity: number;
+  subtotal?: number
+}
+
+export interface ConfirmOrder {
+  username: string
+  password: string
+  items: {
+    id: string;
+    price: number;
+    quantity: number;
+  }[];
+}
+
+export interface Receipt{
+  orderId: string;
+  paymentId: string;
+  total: number;
+  timestamp:number
 }

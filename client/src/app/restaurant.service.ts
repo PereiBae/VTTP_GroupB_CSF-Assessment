@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {inject, Injectable} from '@angular/core';
-import {MenuItem} from './models';
+import {ConfirmOrder, MenuItem, OrderItem} from './models';
 
 @Injectable({
   providedIn: 'root'
@@ -18,4 +18,22 @@ export class RestaurantService {
   }
 
   // TODO: Task 3.2
+
+  placeOrder(orderData:{
+    username: string,
+    password: string,
+    items: OrderItem[]
+  }) {
+    const order: ConfirmOrder={
+      username: orderData.username,
+      password:orderData.password,
+      items: orderData.items.map(item=>({
+        id: item.id,
+        price: item.price,
+        quantity: item.quantity
+      }))
+    }
+    return this.http.post<any>('/api/food_order', order)
+  }
+
 }

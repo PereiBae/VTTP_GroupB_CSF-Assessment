@@ -90,7 +90,6 @@ export class PlaceOrderComponent implements OnInit{
         },
         error: (error) => {
           console.error('Error placing order:', error);
-          // Handle error (could add an error message to the UI)
           alert("Error 400: "+ error.message);
         }
       });

@@ -22,7 +22,6 @@ export class MenuComponent implements OnInit{
   totalCost$: Observable<number> = this.menuStore.totalCost$;
   totalCount$: Observable<number> = this.menuStore.totalCount$;
 
-  // Map to track selected items and their quantities
   totalPrice!: number
   itemCount!: number
   quantity!: number

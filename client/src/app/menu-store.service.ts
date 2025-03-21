@@ -120,8 +120,4 @@ export class MenuStoreService extends ComponentStore<MenuState>{
     return { totalCost, totalCount };
   }
 
-  readonly getOrderItems = this.select<MenuItem[]>(
-    (slice: MenuState) => slice.menuItems
-  )
-
 }

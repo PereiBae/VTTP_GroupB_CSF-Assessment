@@ -1,1 +1,2 @@
 # TODO: Task 1.1
+mongoimport --uri mongodb://localhost:27017  --db mystore --collection menus --type json --jsonArray --file menus.json

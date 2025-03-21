@@ -46,9 +46,9 @@ public class OrdersRepository {
     Document doc = new Document();
     doc.put("_id", orderId);
     doc.put("order_id", orderId);
-    doc.put("payment_id", fromPayment.get("payment_id"));
-    doc.put("username", fromAng.get("username"));
-    doc.put("total", fromPayment.get("total"));
+    doc.put("payment_id", fromPayment.getString("payment_id"));
+    doc.put("username", fromAng.getString("username"));
+    doc.put("total", fromPayment.getJsonNumber("total").doubleValue());
     doc.put("timestamp", new Date(fromPayment.getJsonNumber("timestamp").longValue()) );
     doc.put("items", fromAng.get("items"));
     mongoTemplate.save(doc, "orders");

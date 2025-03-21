@@ -1188,7 +1188,7 @@ vttp_2025|schema||Workshop|localhost|UPDATE|G</Grants>
     </schema>
     <schema id="305" parent="1" name="restaurant">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2025-03-21.04:27:36</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2025-03-21.06:52:04</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <schema id="306" parent="1" name="sys">

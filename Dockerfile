@@ -40,7 +40,7 @@ FROM openjdk:23-jdk
 
 WORKDIR /app
 
-COPY --from=j-build /src/target/news-server-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=j-build /src/target/server-0.0.1-SNAPSHOT.jar app.jar
 
 ENV SERVER_PORT=8080
 ENV SPRING_DATA_MONGODB_URI=mongodb://localhost:27017/b3_assessment
@@ -48,12 +48,6 @@ ENV SPRING_DATA_MONGODB_URI=mongodb://localhost:27017/b3_assessment
 ENV SPRING_DATASOURCE_USERNAME=root
 ENV SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/finalProj
 ENV SPRING_DATASOURECE_PASSWORD=password
-
-ENV S3_KEY_ACCESS=placeholder
-ENV S3_KEY_SECRET=placeholder
-ENV S3_BUCKET_ENDPOINT=placeholder
-ENV S3_BUCKET_REGION=placeholder
-ENV S3_BUCKET=placeholder
 
 EXPOSE ${PORT}
 

@@ -42,80 +42,94 @@ public class RestaurantService {
   // TODO: Task 4
   public JsonObject postFoodOrder(JsonObject payload) {
 
-    String username = payload.getString("username");
-    String password = payload.getString("password");
-    int userExists = restaurantRepo.checkUser(username, password);
-    if (userExists == 1) {
-      System.out.println("User " + username + " does not exist");
+    try{
+      String username = payload.getString("username");
+      String password = payload.getString("password");
+      int userExists = restaurantRepo.checkUser(username, password);
+      if (userExists == 1) {
+        System.out.println("User " + username + " does not exist");
         return Json.createObjectBuilder()
                 .add("message", "Invalid username")
                 .build();
-    } else if (userExists == 2) {
-      System.out.println("User " + username + " has entered the wrong password");
-      return Json.createObjectBuilder()
-              .add("message", "Invalid password")
+      } else if (userExists == 2) {
+        System.out.println("User " + username + " has entered the wrong password");
+        return Json.createObjectBuilder()
+                .add("message", "Invalid password")
+                .build();
+      }
+
+      String orderId = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+      JsonArray jsonArray = payload.getJsonArray("items");
+      int payment = 0;
+      for (int i = 0; i < jsonArray.size(); i++) {
+        JsonObject item = jsonArray.getJsonObject(i);
+        int quantity = item.getInt("quantity");
+        double price = item.getJsonNumber("price").doubleValue();
+        payment += quantity * price;
+      }
+      System.out.println("Total amount to be paid: " + payment);
+
+      RestTemplate restTemplate = new RestTemplate();
+      JsonObject requestPayload = Json.createObjectBuilder()
+              .add("order_id", orderId)
+              .add("payer", username)
+              .add("payee", username)
+              .add("payment", payment)
               .build();
-    }
 
-    String orderId = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-    JsonArray jsonArray = payload.getJsonArray("items");
-    int payment = 0;
-    for (int i = 0; i < jsonArray.size(); i++) {
-      JsonObject item = jsonArray.getJsonObject(i);
-      int quantity = item.getInt("quantity");
-      int price = item.getInt("price");
-      payment += quantity * price;
-    }
-    System.out.println("Total amount to be paid: " + payment);
+      String url = UriComponentsBuilder.fromUriString(PAYMENT_API_URL)
+              .build()
+              .toUriString();
+      System.out.println("URL BUILT: " + url);
 
-    RestTemplate restTemplate = new RestTemplate();
-    JsonObject requestPayload = Json.createObjectBuilder()
-            .add("order_id", orderId)
-            .add("payee", username)
-            .add("payee", username)
-            .add("payment", payment)
-            .build();
+      RequestEntity<String> request = RequestEntity
+              .post(url)
+              .accept(MediaType.APPLICATION_JSON)
+              .contentType(MediaType.APPLICATION_JSON)
+              .header("X-Authenticate", username)
+              .body(requestPayload.toString());
 
-    String url = UriComponentsBuilder.fromUriString(PAYMENT_API_URL)
-            .build()
-            .toUriString();
-    System.out.println("URL BUILT: " + url);
+      ResponseEntity<String> response = restTemplate.exchange(request, String.class);
+      System.out.println("Response received: " + response.getBody());
 
-    RequestEntity<String> request = RequestEntity
-            .post(url)
-            .accept(MediaType.APPLICATION_JSON)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("X-Authenticate", username)
-            .body(requestPayload.toString());
+      if (response.getStatusCode().equals(HttpStatus.OK)) {
+        System.out.println("Payment successful");
+        String responsePayload = response.getBody();
+        JsonReader jsonReader = Json.createReader(new StringReader(responsePayload));
+        JsonObject jsonObject = jsonReader.readObject();
+        try{
+          ordersRepo.save(orderId, payload, jsonObject);
+          System.out.println("Mongo Completed, moving to SQL");
+          restaurantRepo.save(jsonObject, username);
+          System.out.println("MySQL Completed, building JsonObject receipt");
 
-    ResponseEntity<String> response = restTemplate.exchange(request, String.class);
-    System.out.println("Response received: " + response.getBody());
+          return Json.createObjectBuilder()
+                  .add("order_id", orderId)
+                  .add("paymentId", jsonObject.getString("payment_id"))
+                  .add("total", jsonObject.getJsonNumber("total"))
+                  .add("timestamp", jsonObject.getJsonNumber("timestamp"))
+                  .build();
+        } catch (Exception e){
+          e.printStackTrace();
+          return Json.createObjectBuilder()
+                  .add("message", "Order processing failed. Please try again.")
+                  .build();
+        }
+      } else{
 
-    if (response.getStatusCode().equals(HttpStatus.OK)) {
-      System.out.println("Payment successful");
-      String responsePayload = response.getBody();
-      JsonReader jsonReader = Json.createReader(new StringReader(responsePayload));
-      JsonObject jsonObject = jsonReader.readObject();
-      ordersRepo.save(orderId, payload, jsonObject);
-      System.out.println("Mongo Completed, moving to SQL");
-      restaurantRepo.save(jsonObject, username);
-      System.out.println("MySQL Completed, building JsonObject receipt");
+        System.out.println("Payment failed, " + response.getStatusCode() + " " + response.getBody());
+        String responsePayload = response.getBody();
+        JsonReader jsonReader = Json.createReader(new StringReader(responsePayload));
+        JsonObject jsonObject = jsonReader.readObject();
 
         return Json.createObjectBuilder()
-                .add("order_id", orderId)
-                .add("paymentId", payload.getString("payment_id"))
-                .add("total", payload.getJsonNumber("total"))
-                .add("timestamp", payload.getJsonNumber("timestamp"))
+                .add("message", jsonObject.getString("error"))
                 .build();
-    } else{
-
-      System.out.println("Payment failed, " + response.getStatusCode() + " " + response.getBody());
-      String responsePayload = response.getBody();
-      JsonReader jsonReader = Json.createReader(new StringReader(responsePayload));
-      JsonObject jsonObject = jsonReader.readObject();
-
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
       return Json.createObjectBuilder()
-              .add("message", jsonObject.getString("error"))
+              .add("message", "An unexpected error occurred. Please try again.")
               .build();
     }
 

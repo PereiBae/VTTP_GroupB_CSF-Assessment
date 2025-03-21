@@ -16,8 +16,8 @@ public class RestaurantRepository {
 
     public int checkUser(String username, String password) {
 
-        String sql = "SELECT * FROM customers WHERE username = ?";
-        Integer userCount = jdbcTemplate.queryForObject(sql, new Object[]{username}, Integer.class);
+        String sql = "SELECT COUNT(*) FROM customers WHERE username = ?";
+        Integer userCount = jdbcTemplate.queryForObject(sql, Integer.class, username);
 
         if (userCount == 0 || userCount == null) {
             // username does not exist
@@ -39,7 +39,7 @@ public class RestaurantRepository {
 
         String INSERT_SQL = "INSERT INTO place_orders(order_id,payment_id,order_date,total,username) VALUES(?,?,?,?,?)";
 
-        jdbcTemplate.update(INSERT_SQL, jsonObject.getJsonString("order_id"), jsonObject.getJsonString("payment_id"), new Date(jsonObject.getJsonNumber("timestamp").longValue()) ,jsonObject.getJsonNumber("total") , username);
+        jdbcTemplate.update(INSERT_SQL, jsonObject.getString("order_id"), jsonObject.getString("payment_id"), new Date(jsonObject.getJsonNumber("timestamp").longValue()) ,jsonObject.getJsonNumber("total").doubleValue() , username);
 
         System.out.println("Inserted order id: " + jsonObject.getString("order_id"));
     }
